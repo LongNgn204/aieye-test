@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, History, Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Home, History, Eye, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { UserInfo } from './UserInfo';
 
@@ -15,6 +15,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const navItems = [
     { to: "/", icon: Home, label: t('nav_home') },
     { to: "/history", icon: History, label: t('nav_history') },
+    { to: "/about", icon: Info, label: t('nav_about') },
   ];
 
   return (
@@ -40,7 +41,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
               } ${isOpen ? '' : 'justify-center'}`
             }
           >
-            {/* FIX: Use a render prop for children to bring `isActive` into scope for conditional styling on the icon. */}
             {({ isActive }) => (
               <>
                 <item.icon size={22} className={`flex-shrink-0 transition-colors ${isActive ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'}`}/>

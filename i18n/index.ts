@@ -1,7 +1,7 @@
 export const translations = {
   vi: {
     // General
-    appName: "Kiểm tra thị lực cùng AI",
+    appName: "Sức khỏe cùng AI",
     user: "Khách",
 
     // Welcome & Login
@@ -156,6 +156,7 @@ export const translations = {
     general_assessment: "Đánh giá chung",
     potential_causes: "Nguyên nhân tiềm ẩn",
     recommendations: "Khuyến nghị",
+    trend_analysis: "Phân tích Xu hướng",
     redo_test: "Làm lại Test",
     export_pdf: "Xuất PDF",
     exporting_pdf: "Đang xuất...",
@@ -189,6 +190,17 @@ export const translations = {
     chatbot_voice_select_title: "Chọn Giọng Nói",
     chatbot_voice_vietnamese: "Giọng Việt Nam",
     chatbot_voice_uk_english: "Giọng Anh (Anh)",
+    chatbot_mic_toggle: "Ghi âm giọng nói",
+    chatbot_mic_listening: "Đang nghe...",
+
+    // About Page
+    about_title: "Giới thiệu Dự án",
+    about_purpose_title: "Mục đích",
+    about_purpose_content: "Dự án 'Kiểm tra thị lực cùng AI' được xây dựng như một công cụ hỗ trợ, giúp người dùng có cái nhìn tổng quan ban đầu về sức khỏe thị lực của mình một cách tiện lợi. Ứng dụng tích hợp các bài kiểm tra thị lực tiêu chuẩn và sử dụng AI để cung cấp các báo cáo phân tích thông minh, mang tính tham khảo.",
+    about_tech_title: "Công nghệ sử dụng",
+    about_tech_list: "React, TypeScript, Tailwind CSS, Google Gemini Pro API, Vite.",
+    about_disclaimer_title: "Tuyên bố miễn trừ trách nhiệm y tế",
+    about_disclaimer_content: "Ứng dụng này KHÔNG PHẢI là một công cụ chẩn đoán y tế và KHÔNG THỂ thay thế cho việc thăm khám, tư vấn và chẩn đoán của một bác sĩ nhãn khoa hoặc chuyên gia y tế có chuyên môn. Mọi thông tin và báo cáo được tạo ra chỉ mang tính chất tham khảo. Vui lòng tham khảo ý kiến bác sĩ để có lời khuyên y tế chính xác.",
 
     // Footer
     footer_copyright: `© ${new Date().getFullYear()} Kiểm tra thị lực cùng AI. Đồ án bởi Long Nguyen.`,
@@ -351,6 +363,7 @@ export const translations = {
     general_assessment: "General Assessment",
     potential_causes: "Potential Causes",
     recommendations: "Recommendations",
+    trend_analysis: "Trend Analysis",
     redo_test: "Redo Test",
     export_pdf: "Export PDF",
     exporting_pdf: "Exporting...",
@@ -384,7 +397,18 @@ export const translations = {
     chatbot_voice_select_title: "Select Voice",
     chatbot_voice_vietnamese: "Vietnamese Voice",
     chatbot_voice_uk_english: "UK English Voice",
-    
+    chatbot_mic_toggle: "Record voice",
+    chatbot_mic_listening: "Listening...",
+
+    // About Page
+    about_title: "About the Project",
+    about_purpose_title: "Purpose",
+    about_purpose_content: "The 'AI Vision Test' project was created as a supportive tool to help users get a convenient, preliminary overview of their vision health. It integrates standard vision tests and uses AI to provide smart, informational analysis reports.",
+    about_tech_title: "Technology Used",
+    about_tech_list: "React, TypeScript, Tailwind CSS, Google Gemini Pro API, Vite.",
+    about_disclaimer_title: "Medical Disclaimer",
+    about_disclaimer_content: "This application is NOT a medical diagnostic tool and CANNOT replace a visit, consultation, or diagnosis from a qualified ophthalmologist or healthcare professional. All information and reports generated are for informational purposes only. Please consult a doctor for accurate medical advice.",
+
     // Footer
     footer_copyright: `© ${new Date().getFullYear()} AI Vision Test. Project by Long Nguyen.`,
     footer_disclaimer: "This is a demo project and does not replace professional medical diagnosis.",

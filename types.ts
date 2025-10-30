@@ -66,6 +66,7 @@ export interface AIReport {
   recommendations: string[];
   severity: 'LOW' | 'MEDIUM' | 'HIGH';
   prediction?: string;
+  trend?: string; // New field for trend analysis
 }
 
 // For storing in localStorage

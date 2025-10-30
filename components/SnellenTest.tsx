@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { ArrowUp, ArrowRight, ArrowDown, ArrowLeft, RotateCcw, Download, CheckCircle, AlertTriangle, Activity, BrainCircuit } from 'lucide-react';
+import { ArrowUp, ArrowRight, ArrowDown, ArrowLeft, RotateCcw, Download, CheckCircle, AlertTriangle, Activity, BrainCircuit, TrendingUp } from 'lucide-react';
 import { SnellenTestService } from '../services/snellenService';
 import { AIService } from '../services/aiService';
 import { StorageService } from '../services/storageService';
 import { SnellenResult, AIReport } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { usePdfExport } from '../hooks/usePdfExport';
+import { useUser } from '../context/UserContext';
 
 const snellenService = new SnellenTestService();
 const aiService = new AIService();
@@ -62,6 +63,9 @@ const ReportDisplay: React.FC<{ result: SnellenResult; report: AIReport }> = ({ 
 
                 <div className="space-y-6">
                     <div><h4 className="font-bold text-lg mb-2 flex items-center"><Activity className="mr-2 text-blue-500"/>{t('general_assessment')}</h4><p className="text-gray-700 leading-relaxed bg-blue-50 p-4 rounded-lg">{report.summary}</p></div>
+                    {report.trend && (
+                        <div><h4 className="font-bold text-lg mb-2 flex items-center"><TrendingUp className="mr-2 text-indigo-500"/>{t('trend_analysis')}</h4><p className="text-gray-700 leading-relaxed bg-indigo-50 p-4 rounded-lg">{report.trend}</p></div>
+                    )}
                     {report.causes && <div><h4 className="font-bold text-lg mb-2 flex items-center"><AlertTriangle className="mr-2 text-yellow-500"/>{t('potential_causes')}</h4><p className="text-gray-700 leading-relaxed bg-yellow-50 p-4 rounded-lg">{report.causes}</p></div>}
                     <div>
                         <h4 className="font-bold text-lg mb-2 flex items-center"><CheckCircle className="mr-2 text-green-500"/>{t('recommendations')}</h4>
@@ -141,7 +145,8 @@ const StartScreen: React.FC<{ onStart: () => void }> = ({ onStart }) => {
 };
 
 export const SnellenTest: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { userProfile } = useUser();
   const [testState, setTestState] = useState<'start' | 'testing' | 'loading' | 'report'>('start');
   const [questions, setQuestions] = useState<any[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -164,7 +169,8 @@ export const SnellenTest: React.FC = () => {
       const testResult = snellenService.calculateResult();
       setResult(testResult);
       try {
-        const aiReport = await aiService.generateReport('snellen', testResult);
+        const history = storageService.getTestHistory();
+        const aiReport = await aiService.generateReport('snellen', testResult, userProfile, history, language);
         setReport(aiReport);
         storageService.saveTestResult(testResult, aiReport);
         setTestState('report');

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { RotateCcw, CheckCircle, BrainCircuit, Scale, Download } from 'lucide-react';
+import { RotateCcw, CheckCircle, BrainCircuit, Scale, Download, TrendingUp } from 'lucide-react';
 import { DuochromeTestService, DuochromeUserInput } from '../services/duochromeService';
 import { AIService } from '../services/aiService';
 import { StorageService } from '../services/storageService';
 import { DuochromeResult, AIReport } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { usePdfExport } from '../hooks/usePdfExport';
+import { useUser } from '../context/UserContext';
 
 const duochromeService = new DuochromeTestService();
 const aiService = new AIService();
@@ -53,6 +54,9 @@ const ReportDisplay: React.FC<{ result: DuochromeResult; report: AIReport }> = (
 
                 <div className="space-y-6">
                     <div><h4 className="font-bold text-lg mb-2 flex items-center"><Scale className="mr-2 text-blue-500"/>{t('general_assessment')}</h4><p className="text-gray-700 leading-relaxed bg-blue-50 p-4 rounded-lg">{report.summary}</p></div>
+                    {report.trend && (
+                        <div><h4 className="font-bold text-lg mb-2 flex items-center"><TrendingUp className="mr-2 text-indigo-500"/>{t('trend_analysis')}</h4><p className="text-gray-700 leading-relaxed bg-indigo-50 p-4 rounded-lg">{report.trend}</p></div>
+                    )}
                     <div>
                         <h4 className="font-bold text-lg mb-2 flex items-center"><CheckCircle className="mr-2 text-green-500"/>{t('recommendations')}</h4>
                         <ul className="space-y-2 list-inside text-gray-700 bg-green-50 p-4 rounded-lg">
@@ -132,7 +136,8 @@ const StartScreen: React.FC<{ onStart: () => void }> = ({ onStart }) => {
 };
 
 export const DuochromeTest: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { userProfile } = useUser();
   const [testState, setTestState] = useState<'start' | 'testing' | 'loading' | 'report'>('start');
   const [result, setResult] = useState<DuochromeResult | null>(null);
   const [report, setReport] = useState<AIReport | null>(null);
@@ -147,7 +152,8 @@ export const DuochromeTest: React.FC = () => {
     const testResult = duochromeService.calculateResult(selection);
     setResult(testResult);
     try {
-      const aiReport = await aiService.generateReport('duochrome', testResult);
+      const history = storageService.getTestHistory();
+      const aiReport = await aiService.generateReport('duochrome', testResult, userProfile, history, language);
       setReport(aiReport);
       storageService.saveTestResult(testResult, aiReport);
     } catch (err) {

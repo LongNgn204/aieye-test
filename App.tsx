@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Home } from './pages/Home';
 import { History } from './pages/History';
+import { AboutPage } from './pages/AboutPage';
 import { SnellenTest } from './components/SnellenTest';
 import { ColorBlindTest } from './components/ColorBlindTest';
 import { AstigmatismTest } from './components/AstigmatismTest';
@@ -60,6 +61,7 @@ const MainAppLayout: React.FC = () => {
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/history" element={<History />} />
+                        <Route path="/about" element={<AboutPage />} />
                         <Route path="/test/snellen" element={<SnellenTest />} />
                         <Route path="/test/colorblind" element={<ColorBlindTest />} />
                         <Route path="/test/astigmatism" element={<AstigmatismTest />} />

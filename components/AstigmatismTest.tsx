@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RotateCcw, CheckCircle, BrainCircuit, Check, Zap, Download } from 'lucide-react';
+import { RotateCcw, CheckCircle, BrainCircuit, Check, Zap, Download, TrendingUp } from 'lucide-react';
 import { AstigmatismTestService, AstigmatismUserInput } from '../services/astigmatismService';
 import { AIService } from '../services/aiService';
 import { StorageService } from '../services/storageService';
@@ -7,6 +7,7 @@ import { AstigmatismResult, AIReport } from '../types';
 import { AstigmatismWheel } from './AstigmatismWheel';
 import { useLanguage } from '../context/LanguageContext';
 import { usePdfExport } from '../hooks/usePdfExport';
+import { useUser } from '../context/UserContext';
 
 const astigmatismService = new AstigmatismTestService();
 const aiService = new AIService();
@@ -46,6 +47,9 @@ const ReportDisplay: React.FC<{ result: AstigmatismResult; report: AIReport }> =
 
                 <div className="space-y-6">
                     <div><h4 className="font-bold text-lg mb-2 flex items-center"><Zap className="mr-2 text-blue-500"/>{t('general_assessment')}</h4><p className="text-gray-700 leading-relaxed bg-blue-50 p-4 rounded-lg">{report.summary}</p></div>
+                    {report.trend && (
+                        <div><h4 className="font-bold text-lg mb-2 flex items-center"><TrendingUp className="mr-2 text-indigo-500"/>{t('trend_analysis')}</h4><p className="text-gray-700 leading-relaxed bg-indigo-50 p-4 rounded-lg">{report.trend}</p></div>
+                    )}
                     <div>
                         <h4 className="font-bold text-lg mb-2 flex items-center"><CheckCircle className="mr-2 text-green-500"/>{t('recommendations')}</h4>
                         <ul className="space-y-2 list-inside text-gray-700 bg-green-50 p-4 rounded-lg">
@@ -108,7 +112,8 @@ const StartScreen: React.FC<{ onStart: () => void }> = ({ onStart }) => {
 };
 
 export const AstigmatismTest: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { userProfile } = useUser();
   const [testState, setTestState] = useState<'start' | 'testing' | 'loading' | 'report'>('start');
   const [result, setResult] = useState<AstigmatismResult | null>(null);
   const [report, setReport] = useState<AIReport | null>(null);
@@ -123,7 +128,8 @@ export const AstigmatismTest: React.FC = () => {
     const testResult = astigmatismService.calculateResult(selection);
     setResult(testResult);
     try {
-      const aiReport = await aiService.generateReport('astigmatism', testResult);
+      const history = storageService.getTestHistory();
+      const aiReport = await aiService.generateReport('astigmatism', testResult, userProfile, history, language);
       setReport(aiReport);
       storageService.saveTestResult(testResult, aiReport);
     } catch (err) {

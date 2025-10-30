@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { RotateCcw, CheckCircle, Activity, BrainCircuit, Download } from 'lucide-react';
+import { RotateCcw, CheckCircle, Activity, BrainCircuit, Download, TrendingUp } from 'lucide-react';
 import { ColorBlindTestService, Plate } from '../services/colorBlindService';
 import { AIService } from '../services/aiService';
 import { StorageService } from '../services/storageService';
 import { ColorBlindResult, AIReport } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { usePdfExport } from '../hooks/usePdfExport';
+import { useUser } from '../context/UserContext';
 
 const colorBlindService = new ColorBlindTestService();
 const aiService = new AIService();
@@ -84,6 +85,9 @@ const ReportDisplay: React.FC<{ result: ColorBlindResult; report: AIReport }> = 
 
                 <div className="space-y-6">
                     <div><h4 className="font-bold text-lg mb-2 flex items-center"><Activity className="mr-2 text-blue-500"/>{t('general_assessment')}</h4><p className="text-gray-700 leading-relaxed bg-blue-50 p-4 rounded-lg">{report.summary}</p></div>
+                     {report.trend && (
+                        <div><h4 className="font-bold text-lg mb-2 flex items-center"><TrendingUp className="mr-2 text-indigo-500"/>{t('trend_analysis')}</h4><p className="text-gray-700 leading-relaxed bg-indigo-50 p-4 rounded-lg">{report.trend}</p></div>
+                    )}
                     <div>
                         <h4 className="font-bold text-lg mb-2 flex items-center"><CheckCircle className="mr-2 text-green-500"/>{t('recommendations')}</h4>
                         <ul className="space-y-2 list-inside text-gray-700 bg-green-50 p-4 rounded-lg">
@@ -176,7 +180,8 @@ const StartScreen: React.FC<{ onStart: () => void }> = ({ onStart }) => {
 };
 
 export const ColorBlindTest: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { userProfile } = useUser();
   const [testState, setTestState] = useState<'start' | 'testing' | 'loading' | 'report'>('start');
   const [plates, setPlates] = useState<Plate[]>([]);
   const [currentPlate, setCurrentPlate] = useState(0);
@@ -198,7 +203,8 @@ export const ColorBlindTest: React.FC = () => {
       const testResult = colorBlindService.calculateResult();
       setResult(testResult);
       try {
-        const aiReport = await aiService.generateReport('colorblind', testResult);
+        const history = storageService.getTestHistory();
+        const aiReport = await aiService.generateReport('colorblind', testResult, userProfile, history, language);
         setReport(aiReport);
         storageService.saveTestResult(testResult, aiReport);
       } catch (err) {

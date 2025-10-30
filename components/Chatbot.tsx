@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, X, Send, Bot, User, Volume2, VolumeX, Globe, Check } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, User, Volume2, VolumeX, Globe, Check, Mic, MicOff } from 'lucide-react';
 import { ChatbotService } from '../services/chatbotService';
 import { StorageService } from '../services/storageService';
 import { ChatMessage } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useTextToSpeech } from '../hooks/useTextToSpeech';
+import { useChatbotSpeech } from '../hooks/useChatbotSpeech';
 
 const storageService = new StorageService();
 
@@ -21,6 +22,13 @@ export const Chatbot: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const { speak, cancel } = useTextToSpeech();
+  const { isListening, transcript, toggleListening } = useChatbotSpeech();
+
+  useEffect(() => {
+    if (transcript) {
+        setUserInput(prev => prev + transcript);
+    }
+  }, [transcript]);
   
   useEffect(() => {
     if (isOpen) {
@@ -162,10 +170,17 @@ export const Chatbot: React.FC = () => {
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              placeholder={t('chatbot_placeholder')}
+              placeholder={isListening ? t('chatbot_mic_listening') : t('chatbot_placeholder')}
               className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={isLoading}
             />
+            <button
+                onClick={toggleListening}
+                className={`p-3 rounded-lg transition-colors ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
+                title={t('chatbot_mic_toggle')}
+            >
+                {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+            </button>
             <button onClick={handleSend} disabled={isLoading || userInput.trim() === ''} className="bg-blue-600 text-white p-3 rounded-lg disabled:bg-gray-400">
               <Send size={20} />
             </button>
