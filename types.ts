@@ -54,37 +54,18 @@ export interface DuochromeResult {
 
 export type TestResultData = SnellenResult | ColorBlindResult | AstigmatismResult | AmslerGridResult | DuochromeResult;
 
-export interface AIAnalysis {
-  ai: 'gemini' | 'minimax' | 'deepseek';
-  weight: number;
-  confidence: number;
-  assessment: string;
-  trend?: string;
-  causes?: string;
-  recommendations: string[];
-  severity: 'LOW' | 'MEDIUM' | 'HIGH';
-  prediction?: string;
-  responseTime: number; // ms
-}
-
 export interface AIReport {
   id: string;
   testType: TestType;
-  confidence: number; // 0-100
-  status: 'RELIABLE' | 'NEEDS_REVIEW';
+  timestamp: string;
+  totalResponseTime: number;
+  // Analysis fields directly from Gemini
+  confidence: number; // Scaled to 0-100
   summary: string;
-  trend?: string;
   causes?: string;
   recommendations: string[];
   severity: 'LOW' | 'MEDIUM' | 'HIGH';
   prediction?: string;
-  aiDetails: {
-    gemini?: AIAnalysis;
-    minimax?: AIAnalysis;
-    deepseek?: AIAnalysis;
-  };
-  timestamp: string;
-  totalResponseTime: number; // ms
 }
 
 // For storing in localStorage

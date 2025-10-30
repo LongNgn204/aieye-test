@@ -1,15 +1,14 @@
-import React, { useState, useMemo } from 'react';
-import { RotateCcw, CheckCircle, BrainCircuit, Scale, Mic } from 'lucide-react';
+import React, { useState } from 'react';
+import { RotateCcw, CheckCircle, BrainCircuit, Scale, Download } from 'lucide-react';
 import { DuochromeTestService, DuochromeUserInput } from '../services/duochromeService';
-import { ConsensusService } from '../services/aiService';
+import { AIService } from '../services/aiService';
 import { StorageService } from '../services/storageService';
 import { DuochromeResult, AIReport } from '../types';
 import { useLanguage } from '../context/LanguageContext';
-import { useVoiceControl } from '../hooks/useVoiceControl';
-import { useVoiceControlContext } from '../context/VoiceControlContext';
+import { usePdfExport } from '../hooks/usePdfExport';
 
 const duochromeService = new DuochromeTestService();
-const aiService = new ConsensusService();
+const aiService = new AIService();
 const storageService = new StorageService();
 
 const Loader: React.FC = () => {
@@ -29,6 +28,7 @@ const Loader: React.FC = () => {
 
 const ReportDisplay: React.FC<{ result: DuochromeResult; report: AIReport }> = ({ result, report }) => {
     const { t } = useLanguage();
+    const { reportRef, exportToPdf, isExporting } = usePdfExport();
     const resultTextMap = {
       myopic: t('duochrome_myopic'),
       hyperopic: t('duochrome_hyperopic'),
@@ -41,27 +41,37 @@ const ReportDisplay: React.FC<{ result: DuochromeResult; report: AIReport }> = (
     };
 
     return (
-        <div className="bg-white max-w-4xl mx-auto p-4 sm:p-8 rounded-2xl shadow-2xl animate-fade-in">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">{t('report_title_duochrome')}</h2>
-            
-            <div className={`text-center rounded-xl p-6 mb-6 ${resultColorMap[result.result]}`}>
-                <h3 className="text-lg font-semibold text-gray-600 mb-2">{t('test_result')}</h3>
-                <p className="text-3xl font-bold">{resultTextMap[result.result]}</p>
-                <p className="text-sm text-gray-600 mt-2">{result.details}</p>
-            </div>
+        <div className="w-full">
+            <div ref={reportRef} className="bg-white max-w-4xl mx-auto p-4 sm:p-8 rounded-2xl shadow-2xl animate-fade-in">
+                <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">{t('report_title_duochrome')}</h2>
+                
+                <div className={`text-center rounded-xl p-6 mb-6 ${resultColorMap[result.result]}`}>
+                    <h3 className="text-lg font-semibold text-gray-600 mb-2">{t('test_result')}</h3>
+                    <p className="text-3xl font-bold">{resultTextMap[result.result]}</p>
+                    <p className="text-sm text-gray-600 mt-2">{result.details}</p>
+                </div>
 
-            <div className="space-y-6">
-                <div><h4 className="font-bold text-lg mb-2 flex items-center"><Scale className="mr-2 text-blue-500"/>{t('general_assessment')}</h4><p className="text-gray-700 leading-relaxed bg-blue-50 p-4 rounded-lg">{report.summary}</p></div>
-                <div>
-                    <h4 className="font-bold text-lg mb-2 flex items-center"><CheckCircle className="mr-2 text-green-500"/>{t('recommendations')}</h4>
-                    <ul className="space-y-2 list-inside text-gray-700 bg-green-50 p-4 rounded-lg">
-                        {report.recommendations.map((rec, i) => <li key={i} className="flex"><span className="text-green-600 mr-2 font-bold">✓</span>{rec}</li>)}
-                    </ul>
+                <div className="space-y-6">
+                    <div><h4 className="font-bold text-lg mb-2 flex items-center"><Scale className="mr-2 text-blue-500"/>{t('general_assessment')}</h4><p className="text-gray-700 leading-relaxed bg-blue-50 p-4 rounded-lg">{report.summary}</p></div>
+                    <div>
+                        <h4 className="font-bold text-lg mb-2 flex items-center"><CheckCircle className="mr-2 text-green-500"/>{t('recommendations')}</h4>
+                        <ul className="space-y-2 list-inside text-gray-700 bg-green-50 p-4 rounded-lg">
+                            {report.recommendations.map((rec, i) => <li key={i} className="flex"><span className="text-green-600 mr-2 font-bold">✓</span>{rec}</li>)}
+                        </ul>
+                    </div>
                 </div>
             </div>
             
-            <div className="mt-8 flex flex-col sm:flex-row gap-4">
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 max-w-4xl mx-auto">
                 <button onClick={() => window.location.reload()} className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"><RotateCcw size={18}/>{t('redo_test')}</button>
+                <button 
+                    onClick={() => exportToPdf(`duochrome-report-${result.date.split('T')[0]}`)}
+                    disabled={isExporting}
+                    className="flex-1 flex items-center justify-center gap-2 bg-gray-700 text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                    <Download size={18}/>
+                    {isExporting ? t('exporting_pdf') : t('export_pdf')}
+                </button>
             </div>
         </div>
     );
@@ -79,23 +89,7 @@ const DuochromeChart: React.FC = () => (
 );
 
 const TestScreen: React.FC<{ handleSelection: (selection: DuochromeUserInput) => void; }> = ({ handleSelection }) => {
-  const { t, language } = useLanguage();
-  const { isVoiceControlEnabled } = useVoiceControlContext();
-
-  const commands = useMemo(() => language === 'vi'
-    ? [
-        { keywords: ['đỏ'], callback: () => handleSelection('red') },
-        { keywords: ['xanh'], callback: () => handleSelection('green') },
-        { keywords: ['như nhau', 'bằng nhau', 'bình thường'], callback: () => handleSelection('equal') }
-      ]
-    : [
-        { keywords: ['red'], callback: () => handleSelection('red') },
-        { keywords: ['green'], callback: () => handleSelection('green') },
-        { keywords: ['equal', 'same', 'normal'], callback: () => handleSelection('equal') }
-      ],
-  [language, handleSelection]);
-  
-  const { isListening } = useVoiceControl({ commands });
+  const { t } = useLanguage();
 
   const options = [
       { labelKey: 'duochrome_option_red', value: 'red', color: 'bg-red-500 hover:bg-red-600' },
@@ -114,12 +108,6 @@ const TestScreen: React.FC<{ handleSelection: (selection: DuochromeUserInput) =>
              </button>
         ))}
       </div>
-       {isVoiceControlEnabled && (
-         <div className="mt-6 flex items-center justify-center gap-2 text-lg text-yellow-600 bg-yellow-50 px-4 py-2 rounded-full">
-            <Mic size={20} className={isListening ? 'animate-pulse' : ''}/>
-            <span>{t('voice_listening_auto')}</span>
-         </div>
-      )}
     </div>
   );
 };

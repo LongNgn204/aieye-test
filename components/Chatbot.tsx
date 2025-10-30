@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, X, Send, Bot, User, Volume2, VolumeX, Mic, Globe, Check } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, User, Volume2, VolumeX, Globe, Check } from 'lucide-react';
 import { ChatbotService } from '../services/chatbotService';
 import { StorageService } from '../services/storageService';
 import { ChatMessage } from '../types';
 import { useLanguage } from '../context/LanguageContext';
-import { useChatbotSpeech } from '../hooks/useChatbotSpeech';
 import { useTextToSpeech } from '../hooks/useTextToSpeech';
 
 const storageService = new StorageService();
@@ -23,12 +22,6 @@ export const Chatbot: React.FC = () => {
   
   const { speak, cancel } = useTextToSpeech();
   
-  const handleVoiceResult = (transcript: string) => {
-    setUserInput(transcript);
-  };
-
-  const { isRecording, startRecording } = useChatbotSpeech({ onResult: handleVoiceResult });
-
   useEffect(() => {
     if (isOpen) {
       const history = storageService.getTestHistory();
@@ -173,13 +166,6 @@ export const Chatbot: React.FC = () => {
               className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={isLoading}
             />
-             <button
-                onClick={startRecording}
-                title={t('chatbot_mic_aria')}
-                className={`p-3 rounded-lg transition-colors ${isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}`}
-             >
-                <Mic size={20} />
-            </button>
             <button onClick={handleSend} disabled={isLoading || userInput.trim() === ''} className="bg-blue-600 text-white p-3 rounded-lg disabled:bg-gray-400">
               <Send size={20} />
             </button>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, Droplets, Target, Grid, CircleDot, History } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { HealthDashboard } from '../components/HealthDashboard';
 
 const TestCard: React.FC<{test: any}> = ({ test }) => {
     const { t } = useLanguage();
@@ -36,6 +37,9 @@ export const Home: React.FC = () => {
         <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4">{t('home_title')}</h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">{t('home_subtitle')}</p>
       </div>
+
+      <HealthDashboard />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {tests.map(test => <TestCard key={test.nameKey} test={test} />)}
       </div>

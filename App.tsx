@@ -8,7 +8,6 @@ import { AstigmatismTest } from './components/AstigmatismTest';
 import { AmslerGridTest } from './components/AmslerGridTest';
 import { DuochromeTest } from './components/DuochromeTest';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
-import { VoiceControlProvider } from './context/VoiceControlContext';
 import { UserProvider, useUser } from './context/UserContext';
 import { Sidebar } from './components/Sidebar';
 import { Chatbot } from './components/Chatbot';
@@ -27,7 +26,6 @@ const MainAppLayout: React.FC = () => {
       }
     }, [location]);
 
-    // Close sidebar on navigation on mobile
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth >= 1024) {
@@ -99,11 +97,9 @@ export default function App() {
   return (
     <LanguageProvider>
       <UserProvider>
-        <VoiceControlProvider>
           <HashRouter>
               <AppRouter />
           </HashRouter>
-        </VoiceControlProvider>
       </UserProvider>
     </LanguageProvider>
   );
